@@ -33,10 +33,22 @@
 
 var testApp = angular.module('testApp', []);
 testApp.controller('testCont', ['$scope', '$http', function ($scope, $http) {
+    $scope.getter = function(){
+        $http({
+            method: 'get',
+            url: 'function.php?shower=true',
+            headers: {'Content-Type': undefined},
+        })
+            .then(function(response, data, header, status, config) {
+                console.log(response.data);
+                $scope.Records = response.data;
+                
+            });
+    };
     $scope.submit = function(){
         var FD = new FormData(); 
         var userName = $('#userName').val();
-        var password = $('#password').val();
+        var password = $('#password').val();    
         FD.append('userName', userName);
         FD.append('password', password);
         $http({
@@ -46,28 +58,39 @@ testApp.controller('testCont', ['$scope', '$http', function ($scope, $http) {
             headers: {'Content-Type': undefined},
         })
             .then(function(response, header, status, config) {
-                alert('');
                 response.data;
                 $scope.response = response.data;
                 console.log(response.data);
+                $scope.getter();                
             });
         
   }
-// testApp.controller('testCont', ['$scope', '$http', function ($scope, $http) {  
-    $scope.getter = function(){
+    // setInterval(function(){ 
+    //     $http({
+    //         method: 'get',
+    //         url: 'function.php?shower=true',
+    //         // data: FD,
+    //         headers: {'Content-Type': undefined},
+    //     })
+    //         .then(function(response, data, header, status, config) {
+    //             $scope.Records = response.data;
+    //         });
+    // }, 3000);
+
+    $scope.DeleteUser = function(id){
         $http({
-            method: 'get',
-            url: 'function.php?shower=true',
-            // data: FD,
-            headers: {'Content-Type': undefined},
+            method: 'POST',
+            url: 'function.php?DELUSER=true?',
+            data: {id: id},
+            // headers: {'Content-Type': undefined},
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},            
         })
-            .then(function(response, data, header, status, config) {
-                // $scope.response = response.data;
-                console.log(response.data);
-                console.log(response);                
-                $scope.userNames = response.data;
+            .then(function(data) {
+                console.log(data, id);
+                $scope.show_data;
+                $scope.getter();                
             });
-    };
+    }
 }]);
 
 
@@ -93,13 +116,15 @@ testApp.controller('testCont', ['$scope', '$http', function ($scope, $http) {
             <form method="POST">
                 <input type="text" name="userName" placeholder="Username" id="userName">
                 <input type="text" name="password" placeholder="Password" id="password">
-                <input type="submit" name="submit" id="submit" ng-click="submit()" value="Submit">
+                <input type="submit" name="submit" id="submit" ng-click="submit()" ng-init="getter()" value="Submit">
 
-                        <input type="button" id="getter" ng-click="getter()" value="lol">
+                        <input type="button" id="getter" ng-click="getter()" ng-init="getter()" value="lol">
                         <!-- <div ng-bind="userNames"></div> -->
-                            <div ng-repeat="record in userNames">
-                            <td>{{record.id}}</td>                            
-                            <td>{{record.userName}}</td>
+                            <div ng-repeat="record in Records">
+                            <form method="POST">                            
+                                <td>{{record.userName}}</td>
+                                <input type="button" id="DEL_ID" ng-click="DeleteUser(record.id)" value="Delete"/>
+                            </form>
                 </div>
             </form>    
         </div>

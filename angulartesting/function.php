@@ -23,7 +23,7 @@ class Inserting{
                 VALUES('$userName', '$password')");
 
             if($conn == true){
-                echo "Connected to database";
+                echo "->Connected to database";
                 if($sql === true){
                     echo "->SUCCESS: Inserted into database.";
                 }
@@ -33,7 +33,7 @@ class Inserting{
                 echo "->", mysqli_error($conn);
             }
             else{
-                echo "Could not connect to Database";
+                echo "->Could not connect to Database";
                 echo mysqli_error($conn);
             }
             
@@ -42,24 +42,35 @@ class Inserting{
     function getit(){
             $conn = mysqli_connect('localhost', 'root', '', 'test');
             $SqlSelectUN = $conn->query("SELECT * FROM testtable");
-            //$SqlSelectUN = mysqli_query($conn, "SELECT * FROM testtable");
             $data = array();
-            // foreach(username as $username){
-            //     echo JSON_encode($username);
-            //     echo $username;
-            //     echo "came to php file";
-            // }
-            while($row = mysqli_fetch_array($SqlSelectUN)){
+                while($row = mysqli_fetch_array($SqlSelectUN)){
                     $data[] = $row;
-                    // echo $data;
-                    // echo "came to php file";
-                }
-                echo JSON_encode($data);
-
+                } echo JSON_encode($data);
+               
     }
-}
 
-$Insertionn = new Inserting();
+    function deleteUser(){
+        $conn = mysqli_connect('localhost', 'root', '', 'test');
+        $data = json_decode(file_get_contents("php://input"));
+            $userid = $data->id;
+            $sqlDelete= $conn->query("DELETE FROM testtable WHERE id = '$userid'");  
+                $conn->close(); 
+        if($conn == true){   
+            echo "->Connected to database";   
+            if($sqlDelete == true){
+                echo "->Data Deleted!";
+            }
+            else{
+                echo "->Data failed to Delete!";
+            }
+        }
+        else{
+            echo "->Could not connect to database!";
+        }
+    }
+
+}
+ $Insertionn = new Inserting();
 
 
 
@@ -75,6 +86,12 @@ if(isset($_GET['shower'])){
     if($_GET['shower'] == true){
         $Insertionn->getit();
         // echo "";
+    }
+}
+
+if(isset($_GET['DELUSER'])){
+    if($_GET['DELUSER'] == true){
+        $Insertionn->deleteUser();
     }
 }
 
